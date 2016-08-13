@@ -1,8 +1,5 @@
-const User = require('../models/User');
-const Tweet = require('../models/Tweet');
-
 function get(req, res) {
-    const tweets = [
+    const users = [
         {
             id: 1,
             text: 'Hello 140!',
@@ -53,30 +50,9 @@ function get(req, res) {
         },
     ];
 
-    return res.send(tweets);
-}
-
-function post(req, res) {
-    const userSave = User.findOne({ username: req.body.username }).then((user) => {
-        const tweet = new Tweet();
-        tweet.text = req.body.text;
-        tweet.user = user;
-        tweet.type = req.body.type;
-        tweet.created_at = new Date;
-
-        return tweet.save();
-    });
-
-    userSave.then(() => {
-        return res.sendStatus(200);
-    });
-
-    userSave.catch((err) => {
-        return res.sendStatus(500);
-    });
+    return res.send(users);
 }
 
 module.exports = {
-    get,
-    post
+    get
 };
