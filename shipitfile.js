@@ -2,7 +2,7 @@ module.exports = function(shipit) {
     require('shipit-deploy')(shipit);
 
     const deployToPath = '/usr/src/pepo-api';
-    const deployToCurentPath = '/usr/src/pepo-api/current';
+    const deployToCurentPath = deployToPath + '/current';
 
     shipit.initConfig({
         default: {
