@@ -5,6 +5,6 @@ const tweetsController = require('../controllers/tweets');
 const router = Router();
 
 router.get('/', tweetsController.getFeed);
-router.post('/', tweetsController.post);
+router.post('/', tweetsController.createTweet);
 
 module.exports = router;

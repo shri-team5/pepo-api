@@ -34,27 +34,31 @@ function getFeed(req, res) {
         });
 }
 
-function post(req, res) {
-    const userSave = User.findOne({ username: req.body.username }).then((user) => {
-        const tweet = new Tweet();
-        tweet.text = req.body.text;
-        tweet.user = user;
-        tweet.type = req.body.type;
-        tweet.created_at = new Date;
+function createTweet(req, res) {
+    const { userId, text, type } = req.body;
 
-        return tweet.save();
-    });
+    if(!userId) {
+        return res.sendStatus(400);
+    }
 
-    userSave.then(() => {
-        return res.sendStatus(200);
-    });
+    User.findById(userId)
+        .then(user => {
+            const tweet = new Tweet();
+            tweet.text = text;
+            tweet.type = type;
+            tweet.author = user;
 
-    userSave.catch((err) => {
-        return res.sendStatus(500);
-    });
+            return tweet.save();
+        })
+        .then(() => {
+            return res.sendStatus(200);
+        })
+        .catch(() => {
+            return res.sendStatus(500);
+        });
 }
 
 module.exports = {
     getFeed,
-    post
+    createTweet
 };

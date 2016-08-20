@@ -14,8 +14,6 @@ app.use(bodyParser.json());
 app.use('/tweets', tweetsRouter);
 app.use('/users', usersRouter);
 
-const port = process.env.PORT || 4000;
-
 function connect() {
     return mongoose.connect(config.mongodb.uri).connection;
 }
