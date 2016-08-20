@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "lint": "eslint"
+    "start": "nodemon index.js",
+    "lint": "eslint",
+    "create-fake-data": "node fake_data.js"
   },
   "repository": {
     "type": "git",
@@ -21,9 +22,11 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
-    "mongoose": "^4.5.8"
+    "mongoose": "^4.5.8",
+    "ramda": "^0.22.1"
   },
   "devDependencies": {
-    "eslint": "^3.3.1"
+    "eslint": "^3.3.1",
+    "nodemon": "^1.10.2"
   }
 }

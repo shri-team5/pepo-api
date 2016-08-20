@@ -1,59 +1,37 @@
+const { flatten } = require('ramda');
+
 const User = require('../models/User');
 const Tweet = require('../models/Tweet');
 
-function get(req, res) {
-    const tweets = [
-        {
-            id: 1,
-            text: 'Hello 140!',
-            created_at: 1471093167,
-            user: {
-                login: 'superuser1',
-                avatar: 'placehold.it/96x96',
-                name: 'Вася Пупкин',
-                description: '',
-            },
-            type: 'text'
-        },
-        {
-            id: 1,
-            text: 'Hello 141!',
-            created_at: 1471093167,
-            user: {
-                login: 'superuser1',
-                avatar: 'placehold.it/96x96',
-                name: 'Вася Пупкин',
-                description: '',
-            },
-            type: 'text'
-        },
-        {
-            id: 1,
-            text: 'Hello 142!',
-            created_at: 1471093167,
-            user: {
-                login: 'superuser2',
-                avatar: 'placehold.it/96x96',
-                name: 'Вася Пупкин',
-                description: '',
-            },
-            type: 'text'
-        },
-        {
-            id: 1,
-            text: 'Hello 143!',
-            created_at: 1471093168,
-            user: {
-                login: 'superuser2',
-                avatar: 'placehold.it/96x96',
-                name: 'Вася Пупкин',
-                description: '',
-            },
-            type: 'text'
-        },
-    ];
+const { createdAtComparator } = require('../utils');
 
-    return res.send(tweets);
+function getFeed(req, res) {
+    const { userId } = req.query;
+
+    if (!userId) {
+        return res.sendStatus(400);
+    }
+
+    User.findById(userId).populate('subscriptions').exec()
+        .then(user => {
+            const usersForFeed = [...user.subscriptions, user];
+            const tweetsFinds = usersForFeed.reduce((reducer, user) => {
+                reducer.push(Tweet.find({ author: user }).populate('author').exec());
+
+                return reducer;
+            }, []);
+
+            return Promise.all(tweetsFinds);
+        })
+        .then(tweetsByUsers => {
+            const tweets = flatten(tweetsByUsers);
+            tweets.sort(createdAtComparator);
+
+            res.send(tweets);
+        })
+        .catch(() => {
+            res.sendStatus(404);
+        });
 }
 
 function post(req, res) {
@@ -77,6 +55,6 @@ function post(req, res) {
 }
 
 module.exports = {
-    get,
+    getFeed,
     post
 };

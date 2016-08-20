@@ -2,32 +2,61 @@ const config = require('./config');
 const mongoose = require('mongoose');
 const User = require('./models/User');
 const Tweet = require('./models/Tweet');
+mongoose.Promise = Promise;
 
 function connect() {
     return mongoose.connect(config.mongodb.uri).connection;
 }
 
-connect()
-    .on('error', console.error)
-    .on('disconnect', connect);
+function createUser(fullName, avatarPath, username, description) {
+    const user = new User();
+    user.fullName = fullName;
+    user.avatarPath = avatarPath;
+    user.username = username;
+    user.description = description;
 
-const user = new User();
-user.name = 'Иван';
-user.avatarPath = 'http://placehold.it/96x96';
-user.username = 'superuser';
-user.description = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.';
-user.created_at = new Date;
+    return user.save();
+}
 
-user.save(function() {
-  User.findOne({ username: 'superuser' }, function(err, user) {
+function createTweet(text, author, type) {
     const tweet = new Tweet();
-    tweet.text = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.';
-    tweet.user = user;
-    tweet.type = 0;
-    tweet.created_at = new Date;
+    tweet.text = text;
+    tweet.author = author;
+    tweet.type = type;
 
-    tweet.save(function(err) {
-      console.log(err);
-    });
-  });
-});
+    return tweet.save();
+}
+
+function createFakeData() {
+    createUser('Вася Пупкин', 'http://placehold.it/96x96', 'superuser', 'Lorem Ipsum')
+        .then(user => Promise.all([
+            Promise.resolve(user),
+            createTweet(
+                'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+                user, 'text'
+            ),
+            createTweet(
+                'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+                user, 'text'
+            ),
+            createTweet(
+                'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+                user, 'text'
+            )
+        ]))
+        .then(() => {
+            console.log('success!'); // eslint-disable-line
+
+            process.exit();
+        })
+        .catch(err => {
+            console.error(err.message); // eslint-disable-line
+
+            process.exit(1);
+        });
+}
+
+connect()
+    .on('error', console.error) // eslint-disable-line
+    .on('disconnect', connect)
+    .once('open', createFakeData);
