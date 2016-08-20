@@ -2,10 +2,12 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const TweetSchema = new Schema({
-    text: String,
-    user: { type: Schema.Types.ObjectId, ref: 'User' },
-    created_at: { type: Date, default: new Date },
-    type: { type: Number, default: 0 }
+    text: { type: String, maxlength: 140, required: true },
+    type: { type: String, enum: ['text', 'photo', 'geo', 'link'], required: true },
+    author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    parentTweet: { type: Schema.Types.ObjectId, ref: 'Tweet' }
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('Tweet', TweetSchema);

@@ -2,11 +2,13 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-    name: { type: String, required: true },
-    avatarPath: String,
     username: { type: String, required: true, unique: true },
+    fullName: String,
     description: String,
-    created_at: { type: Date, default: new Date }
+    avatarPath: String,
+    subscriptions: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('User', UserSchema);
