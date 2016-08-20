@@ -1,16 +1,18 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const config = require('./config');
 const mongoose = require('mongoose');
 mongoose.Promise = Promise;
 
+const config = require('./config');
 const tweetsRouter = require('./routers/tweets');
+const usersRouter = require('./routers/users');
 
 const app = express();
 
-app.use(bodyParser());
+app.use(bodyParser.json());
 
 app.use('/tweets', tweetsRouter);
+app.use('/users', usersRouter);
 
 const port = process.env.PORT || 4000;
 
