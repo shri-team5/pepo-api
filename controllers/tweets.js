@@ -3,7 +3,7 @@ const { flatten } = require('ramda');
 const User = require('../models/User');
 const Tweet = require('../models/Tweet');
 
-const { createdAtComparator } = require('../utils');
+const { createdAtComparatorDesc } = require('../utils');
 
 function getFeed(req, res) {
     const { userId } = req.query;
@@ -25,7 +25,7 @@ function getFeed(req, res) {
         })
         .then(tweetsByUsers => {
             const tweets = flatten(tweetsByUsers);
-            tweets.sort(createdAtComparator);
+            tweets.sort(createdAtComparatorDesc);
 
             res.send(tweets);
         })
