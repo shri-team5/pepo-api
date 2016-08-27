@@ -39,6 +39,17 @@ function getUser(req, res) {
         .catch(() => res.sendStatus(404));
 }
 
+function getUserByUsername(req, res) {
+    const { username } = req.params;
+
+    return User.findOne({ username: username })
+        .then(user => {
+            if(!user.length) throw new Error;
+            res.send(user);
+        })
+        .catch(() => res.sendStatus(404));
+}
+
 function updateUser(req, res) {
     const {
             username,
@@ -91,6 +102,7 @@ module.exports = {
     getUser,
     createUser,
     updateUser,
+    getUserByUsername,
     getUserByFacebookId,
     getUserByVkontakteId
 };
