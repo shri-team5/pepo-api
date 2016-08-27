@@ -76,8 +76,8 @@ function createUser(req, res) {
     const user = new User;
 
     user.username = username;
-    user.facebook.id = facebookId,
-    user.vkontakte.id = vkontakteId,
+    user.facebook.id = facebookId;
+    user.vkontakte.id = vkontakteId;
     user.fullName = fullName;
     user.description = description;
     user.avatarPath = avatarPath;
