@@ -7,6 +7,7 @@ const router = Router();
 router.get('/:id', usersController.getUser);
 router.get('/vkontakte/:id', usersController.getUserByVkontakteId);
 router.get('/facebook/:id', usersController.getUserByFacebookId);
-router.put('/', usersController.createUser);
+router.post('/', usersController.createUser);
+router.put('/:id', usersController.updateUser);
 
 module.exports = router;
