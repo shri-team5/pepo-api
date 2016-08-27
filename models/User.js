@@ -3,6 +3,8 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
     username: { type: String, required: true, unique: true },
+    vkId: { type: String, unique: true },
+    fbId: { type: String, unique: true },
     fullName: String,
     description: String,
     avatarPath: String,
