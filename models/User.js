@@ -3,8 +3,12 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
     username: { type: String, required: true, unique: true },
-    vkId: { type: String, unique: true },
-    fbId: { type: String, unique: true },
+    vkontakte: {
+        id: { type: String }
+    },
+    facebook: {
+        id: { type: String }
+    },
     fullName: String,
     description: String,
     avatarPath: String,
