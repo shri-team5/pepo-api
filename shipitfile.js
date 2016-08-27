@@ -23,10 +23,10 @@ module.exports = function(shipit) {
     });
 
     shipit.task('start', function() {
-        return shipit.remote(`cd ${deployToCurentPath} && npm install && PORT=8080 npm start`);
+        return shipit.remote(`cd ${deployToCurentPath} && npm install && NODE_ENV=production npm start`);
     });
 
     shipit.task('stop', function() {
-        return shipit.remote(`cd ${deployToCurentPath} && npm run stop`);
+        return shipit.remote(`cd ${deployToCurentPath} && npm stop`);
     });
 };
