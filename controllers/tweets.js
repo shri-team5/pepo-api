@@ -1,32 +1,23 @@
-const { flatten } = require('ramda');
-
 const User = require('../models/User');
 const Tweet = require('../models/Tweet');
 
-const { createdAtComparatorDesc } = require('../utils');
-
 function getFeed(req, res) {
-    const { userId } = req.query;
+    const { userId, offset, count } = req.query;
 
     if (!userId) {
         return res.sendStatus(400);
     }
 
-    User.findById(userId).populate('subscriptions').exec()
+    User.findById(userId).exec()
         .then(user => {
-            const usersForFeed = [...user.subscriptions, user];
-            const tweetsFinds = usersForFeed.reduce((reducer, user) => {
-                reducer.push(Tweet.find({ author: user }).populate('author').exec());
-
-                return reducer;
-            }, []);
-
-            return Promise.all(tweetsFinds);
+            const userIds = [...user.subscriptions, userId];
+            return Tweet.find({ author: { $in: userIds } }, null, {
+                skip: +offset,
+                limit: +count,
+                sort: { createdAt: 'desc' }
+            }).populate('author').exec();
         })
-        .then(tweetsByUsers => {
-            const tweets = flatten(tweetsByUsers);
-            tweets.sort(createdAtComparatorDesc);
-
+        .then(tweets => {
             res.send(tweets);
         })
         .catch(() => {
