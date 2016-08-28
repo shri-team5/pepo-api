@@ -24,6 +24,21 @@ function getFeed(req, res) {
             res.sendStatus(404);
         });
 }
+function getWorldFeed(req, res) {
+    const { offset, count } = req.query;
+
+    Tweet.find({}, null, {
+        skip: +offset,
+        limit: +count,
+        sort: { createdAt: 'desc' }
+    }).populate('author').exec()
+        .then(tweets => {
+            res.send(tweets);
+        })
+        .catch(() => {
+            res.sendStatus(404);
+        });
+}
 
 function createTweet(req, res) {
     const { userId, text, type } = req.body;
@@ -51,5 +66,6 @@ function createTweet(req, res) {
 
 module.exports = {
     getFeed,
+    getWorldFeed,
     createTweet
 };
