@@ -44,7 +44,6 @@ function getUserByUsername(req, res) {
 
     return User.findOne({ username: username })
         .then(user => {
-            if(!user.length) throw new Error;
             res.send(user);
         })
         .catch(() => res.sendStatus(404));
