@@ -97,11 +97,42 @@ function createUser(req, res) {
         .catch(() => res.sendStatus(400));
 }
 
+function subscribe(req, res) {
+    const {subscriber_id} = req.body,
+        {user_id} = req.params;
+
+    User.findById(subscriber_id)
+        .then(user => {
+            user.subscriptions.push(user_id);
+            user.save()
+                .then(()=>res.sendStatus(200))
+                .catch(()=>res.sendStatus(500))
+        })
+        .catch(() => res.sendStatus(404))
+}
+
+
+function unsubscribe(req, res) {
+    const {subscriber_id} = req.body,
+        {user_id} = req.params;
+
+    User.findById(subscriber_id)
+        .then(user => {
+            user.subscriptions.pull(user_id);
+            user.save()
+                .then(()=>res.sendStatus(200))
+                .catch(()=>res.sendStatus(500))
+        })
+        .catch(() => res.sendStatus(404))
+}
+
 module.exports = {
     getUser,
     createUser,
     updateUser,
     getUserByUsername,
     getUserByFacebookId,
-    getUserByVkontakteId
+    getUserByVkontakteId,
+    subscribe,
+    unsubscribe
 };
