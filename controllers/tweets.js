@@ -2,7 +2,7 @@ const User = require('../models/User');
 const Tweet = require('../models/Tweet');
 
 function getFeed(req, res) {
-    const { userId, offset, count } = req.query;
+    const { userId, offset, count, ownTweetsOnly } = req.query;
 
     if (!userId) {
         return res.sendStatus(400);
@@ -10,7 +10,7 @@ function getFeed(req, res) {
 
     User.findById(userId).exec()
         .then(user => {
-            const userIds = [...user.subscriptions, userId];
+            const userIds = ownTweetsOnly === 'true' ? [userId] : [...user.subscriptions, userId];
             return Tweet.find({ author: { $in: userIds } }, null, {
                 skip: +offset,
                 limit: +count,
@@ -24,6 +24,7 @@ function getFeed(req, res) {
             res.sendStatus(404);
         });
 }
+
 function getWorldFeed(req, res) {
     const { offset, count } = req.query;
 
