@@ -1,18 +1,19 @@
-const { path } = require('ramda');
+const {path} = require('ramda');
 
 const User = require('../models/User');
+const Tweet = require('../models/Tweet');
 
 const vkontakteIdPath = path(['vkontakte', 'id']);
 const facebookIdPath = path(['facebook', 'id']);
 
 function getUserByCustomId(req, res, next, provider) {
-    const { id } = req.params;
+    const {id} = req.params;
 
     if (!id) {
         return Promise.resolve(res.sendStatus(400));
     }
 
-    return User.findOne({ [`${provider}.id`]: id })
+    return User.findOne({[`${provider}.id`]: id})
         .then((user) => {
             if (user) {
                 return res.send(user);
@@ -32,19 +33,40 @@ function getUserByVkontakteId(...params) {
 }
 
 function getUser(req, res) {
-    const { id } = req.params;
+    const {id} = req.params;
 
-    return User.findById(id)
-        .then(user => res.send(user))
-        .catch(() => res.sendStatus(404));
+    const user = User.findById(id);
+    const userTweetsNumber = Tweet.count({"author": id});
+    const userSubscribersNumber = User.count({subscriptions: {$in: [id]}});
+
+    Promise.all([user, userTweetsNumber, userSubscribersNumber])
+        .then(responses => {
+            res.send(Object.assign({},
+                {tweetsNumber: responses[1]},
+                {subscribersNumber: responses[2]},
+                responses[0]._doc));
+        })
+        .catch(() => res.sendStatus(404))
+
 }
 
 function getUserByUsername(req, res) {
-    const { username } = req.params;
+    const {username} = req.params;
 
-    return User.findOne({ username: username })
+    return User.findOne({username: username})
         .then(user => {
-            res.send(user);
+
+            const userTweetsNumber = Tweet.count({"author": user._id});
+            const userSubscribersNumber = User.count({subscriptions: {$in: [user._id]}});
+
+            Promise.all([userTweetsNumber, userSubscribersNumber])
+                .then(responses => {
+                    res.send(Object.assign({},
+                        {tweetsNumber: responses[0]},
+                        {subscribersNumber: responses[1]},
+                        user._doc));
+                })
+                .catch(() => res.sendStatus(500));
         })
         .catch(() => res.sendStatus(404));
 }
@@ -56,7 +78,7 @@ function updateUser(req, res) {
             description,
             avatarPath
         } = req.body,
-        { id } = req.params,
+        {id} = req.params,
         update = {};
 
     if (!id) {
