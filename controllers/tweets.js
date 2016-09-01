@@ -42,7 +42,7 @@ function getWorldFeed(req, res) {
 }
 
 function createTweet(req, res) {
-    const {userId, text, type} = req.body;
+    const {userId, text, type, parentTweet} = req.body;
 
     if (!userId) {
         return res.sendStatus(400);
@@ -54,6 +54,7 @@ function createTweet(req, res) {
             tweet.text = text;
             tweet.type = type;
             tweet.author = user;
+            (parentTweet) && (tweet.parentTweet = parentTweet);
 
             return tweet.save();
         })
@@ -74,13 +75,26 @@ function getReplies(req, res) {
         return res.sendStatus(400);
     }
 
-    Tweet.find({ parentTweet: tweetId }, null, {
+    Tweet.find({parentTweet: tweetId}, null, {
         skip: +offset,
         limit: +count,
-        sort: {createdAt: 'desc'}
+        sort: {createdAt: 'asc'}
     }).populate('author').exec()
         .then(tweets => {
             res.send(tweets);
+        })
+        .catch(() => {
+            res.sendStatus(404);
+        });
+}
+
+function getTweet(req, res) {
+
+    const {tweetId} = req.params;
+
+    Tweet.findById(tweetId).populate('author').exec()
+        .then(tweet => {
+            res.send(tweet);
         })
         .catch(() => {
             res.sendStatus(404);
@@ -91,5 +105,6 @@ module.exports = {
     getFeed,
     getWorldFeed,
     createTweet,
-    getReplies
+    getReplies,
+    getTweet
 };
