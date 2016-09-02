@@ -18,8 +18,12 @@ module.exports = function(shipit) {
     });
 
     shipit.on('published', function() {
-        shipit.start('stop');
         shipit.start('start');
+    });
+
+    shipit.task('start-deploy', function() {
+        shipit.start('stop');
+        shipit.start('deploy');
     });
 
     shipit.task('start', function() {
