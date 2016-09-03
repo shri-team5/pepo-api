@@ -99,8 +99,8 @@ function createTweet(req, res) {
         .then((tweet) => {
             return tweet.save();
         })
-        .then(() => {
-            return res.sendStatus(200);
+        .then((data) => {
+            return res.send(data);
         })
         .catch(() => {
             return res.sendStatus(500);
