@@ -25,7 +25,9 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "mongoose": "^4.5.8",
-    "ramda": "^0.22.1"
+    "multer": "^1.2.0",
+    "ramda": "^0.22.1",
+    "s3-uploader": "^2.0.2"
   },
   "devDependencies": {
     "eslint": "^3.3.1",
