@@ -1,6 +1,31 @@
 const User = require('../models/User');
 const Tweet = require('../models/Tweet');
 
+const config = require('../config');
+const s3Uploader = require('s3-uploader');
+const s3Client = new s3Uploader(config.s3.bucket_name, {
+    aws: {
+        path: 'images/',
+        region: config.s3.region,
+        acl: 'public-read',
+        accessKeyId: config.s3.access_key_id,
+        secretAccessKey: config.s3.secret_access_key
+    },
+    cleanup: {
+        original: true,
+        versions: true
+    },
+    original: {
+        awsImageAcl: 'public-read'
+    },
+    versions: [{
+        maxWidth: 640,
+        maxHeight: 640,
+        format: 'png',
+        suffix: '-thumb'
+    }]
+});
+
 function getFeed(req, res) {
     const {userId, offset, count, ownTweetsOnly} = req.query;
 
@@ -56,6 +81,22 @@ function createTweet(req, res) {
             tweet.author = user;
             (parentTweet) && (tweet.parentTweet = parentTweet);
 
+            return new Promise(function(fulfill, reject) {
+                if(req.file) {
+                    s3Client.upload(req.file.path, {}, function(err, versions) {
+                        if(err) {
+                            reject(err);
+                        } else {
+                            tweet.image = versions[0].url;
+                            fulfill(tweet);
+                        }
+                    });
+                } else {
+                    fulfill(tweet);
+                }
+            });
+        })
+        .then((tweet) => {
             return tweet.save();
         })
         .then(() => {
