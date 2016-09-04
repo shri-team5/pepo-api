@@ -2,6 +2,8 @@ const User = require('../models/User');
 const Tweet = require('../models/Tweet');
 
 const config = require('../config');
+var xss = require('xss');
+
 const s3Uploader = require('s3-uploader');
 const s3Client = new s3Uploader(config.s3.bucket_name, {
     aws: {
@@ -76,7 +78,7 @@ function createTweet(req, res) {
     User.findById(userId)
         .then(user => {
             const tweet = new Tweet();
-            tweet.text = text;
+            tweet.text = xss(text);
             tweet.type = type;
             tweet.author = user;
             (parentTweet) && (tweet.parentTweet = parentTweet);
