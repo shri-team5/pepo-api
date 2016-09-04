@@ -2,31 +2,8 @@ const User = require('../models/User');
 const Tweet = require('../models/Tweet');
 
 const config = require('../config');
-var xss = require('xss');
-
-const s3Uploader = require('s3-uploader');
-const s3Client = new s3Uploader(config.s3.bucket_name, {
-    aws: {
-        path: 'images/',
-        region: config.s3.region,
-        acl: 'public-read',
-        accessKeyId: config.s3.access_key_id,
-        secretAccessKey: config.s3.secret_access_key
-    },
-    cleanup: {
-        original: true,
-        versions: true
-    },
-    original: {
-        awsImageAcl: 'public-read'
-    },
-    versions: [{
-        maxWidth: 640,
-        maxHeight: 640,
-        format: 'png',
-        suffix: '-thumb'
-    }]
 var cloudinary = require('cloudinary');
+var xss = require('xss');
 
 cloudinary.config({
     cloud_name: config.cloudinary.cloud_name,
