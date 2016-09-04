@@ -8,6 +8,7 @@
     "stop": "forever stop index.js",
     "start:dev": "nodemon index.js",
     "lint": "eslint",
+    "deploy": "shipit production start-deploy",
     "create-fake-data": "node fake_data.js"
   },
   "repository": {
@@ -23,6 +24,7 @@
   "homepage": "https://github.com/shri-team5/pepo-api#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "cloudinary": "^1.4.1",
     "express": "^4.14.0",
     "mongoose": "^4.5.8",
     "multer": "^1.2.0",

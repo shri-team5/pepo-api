@@ -10,6 +10,7 @@ const usersRouter = require('./routers/users');
 const app = express();
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/tweets', tweetsRouter);
 app.use('/users', usersRouter);

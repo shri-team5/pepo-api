@@ -2,28 +2,12 @@ const User = require('../models/User');
 const Tweet = require('../models/Tweet');
 
 const config = require('../config');
-const s3Uploader = require('s3-uploader');
-const s3Client = new s3Uploader(config.s3.bucket_name, {
-    aws: {
-        path: 'images/',
-        region: config.s3.region,
-        acl: 'public-read',
-        accessKeyId: config.s3.access_key_id,
-        secretAccessKey: config.s3.secret_access_key
-    },
-    cleanup: {
-        original: true,
-        versions: true
-    },
-    original: {
-        awsImageAcl: 'public-read'
-    },
-    versions: [{
-        maxWidth: 640,
-        maxHeight: 640,
-        format: 'png',
-        suffix: '-thumb'
-    }]
+var cloudinary = require('cloudinary');
+
+cloudinary.config({
+    cloud_name: config.cloudinary.cloud_name,
+    api_key: config.cloudinary.access_key_id,
+    api_secret: config.cloudinary.secret_access_key
 });
 
 function getFeed(req, res) {
@@ -83,14 +67,18 @@ function createTweet(req, res) {
 
             return new Promise(function(fulfill, reject) {
                 if(req.file) {
-                    s3Client.upload(req.file.path, {}, function(err, versions) {
-                        if(err) {
-                            reject(err);
-                        } else {
-                            tweet.image = versions[0].url;
+                    cloudinary.uploader.upload(
+                        req.file.path,
+                        function(result) {
+                            console.log(result);
+                            tweet.image = result.url;
                             fulfill(tweet);
-                        }
-                    });
+                        },
+                        {
+                            crop: 'limit',
+                            width: 640,
+                            height: 640
+                        });
                 } else {
                     fulfill(tweet);
                 }
