@@ -26,6 +26,12 @@ const s3Client = new s3Uploader(config.s3.bucket_name, {
         format: 'png',
         suffix: '-thumb'
     }]
+var cloudinary = require('cloudinary');
+
+cloudinary.config({
+    cloud_name: config.cloudinary.cloud_name,
+    api_key: config.cloudinary.access_key_id,
+    api_secret: config.cloudinary.secret_access_key
 });
 
 function getFeed(req, res) {
@@ -85,14 +91,18 @@ function createTweet(req, res) {
 
             return new Promise(function(fulfill, reject) {
                 if(req.file) {
-                    s3Client.upload(req.file.path, {}, function(err, versions) {
-                        if(err) {
-                            reject(err);
-                        } else {
-                            tweet.image = versions[0].url;
+                    cloudinary.uploader.upload(
+                        req.file.path,
+                        function(result) {
+                            console.log(result);
+                            tweet.image = result.url;
                             fulfill(tweet);
-                        }
-                    });
+                        },
+                        {
+                            crop: 'limit',
+                            width: 640,
+                            height: 640
+                        });
                 } else {
                     fulfill(tweet);
                 }
