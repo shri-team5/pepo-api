@@ -5,3 +5,4 @@ node_modules/
 .svn
 .tmp
 npm-debug.log
+tmp/
