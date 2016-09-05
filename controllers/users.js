@@ -6,6 +6,17 @@ const Tweet = require('../models/Tweet');
 const vkontakteIdPath = path(['vkontakte', 'id']);
 const facebookIdPath = path(['facebook', 'id']);
 
+var cloudinary = require('cloudinary');
+var xss = require('xss');
+
+const config = require('../config');
+cloudinary.config({
+    cloud_name: config.cloudinary.cloud_name,
+    api_key: config.cloudinary.access_key_id,
+    api_secret: config.cloudinary.secret_access_key
+});
+
+
 function getUserByCustomId(req, res, next, provider) {
     const {id} = req.params;
 
@@ -75,8 +86,7 @@ function updateUser(req, res) {
     const {
             username,
             fullName,
-            description,
-            avatarPath
+            description
         } = req.body,
         {id} = req.params,
         update = {};
@@ -88,11 +98,31 @@ function updateUser(req, res) {
     username && (update.username = username);
     fullName && (update.fullName = fullName);
     description && (update.description = description);
-    avatarPath && (update.avatarPath = description);
 
-    return User.findByIdAndUpdate(id, update)
-        .then(() => res.sendStatus(200))
-        .catch(() => res.sendStatus(500));
+    new Promise((resolve, reject)=> {
+        if (req.file) {
+            cloudinary.uploader.upload(
+                req.file.path,
+                function (result) {
+                    update.avatarPath = result.url;
+                    resolve(update);
+                },
+                {
+                    crop: 'fill',
+                    width: 240,
+                    height: 240
+                });
+        }
+        else {
+            resolve(update);
+        }
+    })
+        .then((update)=> {
+            return User.findByIdAndUpdate(id, update)
+                .then(() => res.sendStatus(200))
+                .catch(() => res.sendStatus(500));
+        });
+
 }
 
 function createUser(req, res) {
