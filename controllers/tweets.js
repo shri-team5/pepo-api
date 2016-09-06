@@ -66,11 +66,11 @@ function createTweet(req, res) {
             tweet.author = user;
             (parentTweet) && (tweet.parentTweet = parentTweet);
 
-            return new Promise(function(fulfill, reject) {
-                if(req.file) {
+            return new Promise(function (fulfill, reject) {
+                if (req.file) {
                     cloudinary.uploader.upload(
                         req.file.path,
-                        function(result) {
+                        function (result) {
                             console.log(result);
                             tweet.image = result.url;
                             fulfill(tweet);
@@ -116,6 +116,41 @@ function getReplies(req, res) {
         .catch(() => {
             res.sendStatus(404);
         });
+}
+
+function getTweets(req, res) {
+    const {user, feed, tweet, search, offset, count,} = req.query;
+
+    new Promise((resolve, reject)=> {
+
+        if (feed) {
+            User.findById(userId).exec()
+                .then(user => {
+                    resolve({author: {$in: [...user.subscriptions, feed]}})
+                })
+                .catch(() => {
+                    res.sendStatus(404);
+                });
+        } else{
+            user && resolve({author: {$in: [user]}});
+            tweet && resolve({parentTweet: tweet});
+            search && resolve({"text" : {$regex : ".*"+search+".*"}});
+            resolve({});
+        }
+    })
+        .then(query => {
+            Tweet.find(query, null, {
+                skip: +offset,
+                limit: +count,
+                sort: {createdAt: 'desc'}
+            }).populate('author').exec()
+                .then(tweets => {
+                    res.send(tweets);
+                })
+                .catch(() => {
+                    res.sendStatus(404);
+                });
+        })
 }
 
 function getTweet(req, res) {
