@@ -124,12 +124,12 @@ function getTweets(req, res) {
     new Promise((resolve, reject)=> {
 
         if (feed) {
-            User.findById(userId).exec()
+            User.findById(feed).exec()
                 .then(user => {
                     resolve({author: {$in: [...user.subscriptions, feed]}})
                 })
                 .catch(() => {
-                    res.sendStatus(404);
+                    reject();
                 });
         } else{
             user && resolve({author: {$in: [user]}});
@@ -151,6 +151,9 @@ function getTweets(req, res) {
                     res.sendStatus(404);
                 });
         })
+        .catch(()=>{
+            res.sendStatus(404);
+        });
 }
 
 function getTweet(req, res) {
@@ -171,5 +174,6 @@ module.exports = {
     getWorldFeed,
     createTweet,
     getReplies,
-    getTweet
+    getTweet,
+    getTweets
 };

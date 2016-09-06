@@ -17,6 +17,7 @@ const tweetsController = require('../controllers/tweets');
 const router = Router();
 
 router.get('/', tweetsController.getFeed);
+router.get('/v2/', tweetsController.getTweets);
 router.get('/world', tweetsController.getWorldFeed);
 router.get('/:tweetId', tweetsController.getTweet);
 router.get('/:tweetId/replies', tweetsController.getReplies);
