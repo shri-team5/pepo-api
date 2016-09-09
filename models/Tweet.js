@@ -7,7 +7,8 @@ const TweetSchema = new Schema({
     type: { type: String, enum: ['text', 'photo', 'geo', 'link'], required: true },
     author: { type: ObjectId, ref: 'User', required: true },
     image: { type: String },
-    parentTweet: { type: ObjectId, ref: 'Tweet' }
+    parentTweet: { type: ObjectId, ref: 'Tweet' },
+    location: { type: String, maxlength: 140},
 }, {
     timestamps: true
 });
