@@ -11,48 +11,8 @@ cloudinary.config({
     api_secret: config.cloudinary.secret_access_key
 });
 
-function getFeed(req, res) {
-    const {userId, offset, count, ownTweetsOnly} = req.query;
-
-    if (!userId) {
-        return res.sendStatus(400);
-    }
-
-    User.findById(userId).exec()
-        .then(user => {
-            const userIds = ownTweetsOnly === 'true' ? [userId] : [...user.subscriptions, userId];
-            return Tweet.find({author: {$in: userIds}}, null, {
-                skip: +offset,
-                limit: +count,
-                sort: {createdAt: 'desc'}
-            }).populate('author').exec();
-        })
-        .then(tweets => {
-            res.send(tweets);
-        })
-        .catch(() => {
-            res.sendStatus(404);
-        });
-}
-
-function getWorldFeed(req, res) {
-    const {offset, count} = req.query;
-
-    Tweet.find({}, null, {
-        skip: +offset,
-        limit: +count,
-        sort: {createdAt: 'desc'}
-    }).populate('author').exec()
-        .then(tweets => {
-            res.send(tweets);
-        })
-        .catch(() => {
-            res.sendStatus(404);
-        });
-}
-
 function createTweet(req, res) {
-    const {userId, text, type, parentTweet} = req.body;
+    const {userId, text, type, parentTweet, location, address} = req.body;
 
     if (!userId) {
         return res.sendStatus(400);
@@ -65,6 +25,8 @@ function createTweet(req, res) {
             tweet.type = type;
             tweet.author = user;
             (parentTweet) && (tweet.parentTweet = parentTweet);
+            (location) && (tweet.location = location);
+            (address) && (tweet.parentTweet = address);
 
             return new Promise(function (fulfill, reject) {
                 if (req.file) {
@@ -93,28 +55,6 @@ function createTweet(req, res) {
         })
         .catch(() => {
             return res.sendStatus(500);
-        });
-}
-
-function getReplies(req, res) {
-
-    const {offset, count} = req.query;
-    const {tweetId} = req.params;
-
-    if (!tweetId) {
-        return res.sendStatus(400);
-    }
-
-    Tweet.find({parentTweet: tweetId}, null, {
-        skip: +offset,
-        limit: +count,
-        sort: {createdAt: 'asc'}
-    }).populate('author').exec()
-        .then(tweets => {
-            res.send(tweets);
-        })
-        .catch(() => {
-            res.sendStatus(404);
         });
 }
 
@@ -170,10 +110,7 @@ function getTweet(req, res) {
 }
 
 module.exports = {
-    getFeed,
-    getWorldFeed,
     createTweet,
-    getReplies,
     getTweet,
     getTweets
 };
