@@ -34,7 +34,7 @@ function createTweet(req, res) {
                         req.file.path,
                         function (result) {
                             console.log(result);
-                            tweet.image = result.url;
+                            tweet.image = result.secure_url;
                             fulfill(tweet);
                         },
                         {
