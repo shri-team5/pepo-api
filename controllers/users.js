@@ -104,7 +104,7 @@ function updateUser(req, res) {
             cloudinary.uploader.upload(
                 req.file.path,
                 function (result) {
-                    update.avatarPath = result.url;
+                    update.avatarPath = result.secure_url;
                     resolve(update);
                 },
                 {
