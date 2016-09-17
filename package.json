@@ -8,6 +8,7 @@
     "stop": "forever stop index.js",
     "start:dev": "nodemon index.js",
     "lint": "eslint",
+    "test": "mocha",
     "deploy": "shipit production start-deploy",
     "create-fake-data": "node fake_data.js"
   },
@@ -33,11 +34,14 @@
     "xss": "^0.2.13"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "eslint": "^3.3.1",
     "forever": "^0.15.2",
     "migrate-mongoose": "^2.0.2",
+    "mocha": "^3.0.2",
     "nodemon": "^1.10.2",
     "shipit-cli": "^1.4.1",
-    "shipit-deploy": "^2.2.0"
+    "shipit-deploy": "^2.2.0",
+    "supertest": "^2.0.0"
   }
 }
