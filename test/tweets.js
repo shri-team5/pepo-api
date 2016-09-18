@@ -4,16 +4,25 @@ var chai = require('chai');
 var config = require('../config/environments/testing');
 
 describe('Tweets', function() {
+    var server;
 
-    before(function(done) {
-        // In our tests we use the test db
-        mongoose.connect(config.mongodb.uri)
-        done();
+    before(function() {
+        server = require('../index');
     });
 
-    it('Should Do Nothing', function() {
-        chai.expect(1).to.be.ok;
+    after(function () {
+        server.close();
+    });
 
-    })
+    it('Get 200 from /tweets', function(done) {
+        request(server)
+            .get('/tweets')
+            .expect(200, done);
+    });
 
+    it('Get 404 from /', function(done) {
+        request(server)
+            .get('/')
+            .expect(404, done);
+    });
 });

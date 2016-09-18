@@ -22,12 +22,19 @@ function connect() {
 function listen() {
     const port = process.env.PORT || config.defaultPort;
 
-    app.listen(port, () => {
+    return app.listen(port, () => {
         console.log(`Server started at port: ${port}`);
     });
 }
 
+const server = listen();
+
 connect()
     .on('error', console.error)
     .on('disconnect', connect)
-    .once('open', listen);
+    .once('open',  function() {
+        console.log('Mongoose connected!');
+    });
+
+
+module.exports = server;
