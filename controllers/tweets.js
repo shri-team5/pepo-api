@@ -120,21 +120,25 @@ function getTweets(req, res) {
                 .then(tweets => {
                     const countTweets = tweets.length;
                     let counter = 0;
-                    tweets.forEach(tweet=> {
-                        countReplies(tweet._id).then(resp=> {
-                            if (resp.length) {
-                                var foundIndex = tweets.findIndex(x => String(x._id) === String(resp[0]._id));
-                                foundIndex >= 0 && (tweets[foundIndex].replies = resp[0].number);
-                            }
-                            if (++counter == countTweets) {
-                                res.send(tweets);
-                            }
-                        }).catch(err=> {
-                            console.log(err);
-                            res.send(tweets);
-                        })
-                    });
+                    if(countTweets){
+                        tweets.forEach(tweet=> {
+                            countReplies(tweet._id).then(resp=> {
+                                if (resp.length) {
+                                    var foundIndex = tweets.findIndex(x => String(x._id) === String(resp[0]._id));
+                                    foundIndex >= 0 && (tweets[foundIndex].replies = resp[0].number);
+                                }
 
+                                if (++counter >= countTweets) {
+                                    res.send(tweets);
+                                }
+                            }).catch(err=> {
+                                console.log(err);
+                                res.send(tweets);
+                            })
+                        });
+                    }else{
+                        res.send(tweets);
+                    }
                 })
                 .catch(() => {
                     res.sendStatus(404);
