@@ -12,6 +12,20 @@ cloudinary.config({
 });
 
 /**
+ * Get replies
+ * @param {Number} tweet_id - tweet id
+ * @returns {Aggregate|Promise}
+ */
+function countReplies(tweet_id) {
+    return Tweet.aggregate(
+        [
+            {$match: {parentTweet: {$in: [tweet_id]}}},
+            {$project: {parentTweet: 1, count: {$add: [1]}}},
+            {$group: {_id: "$parentTweet", number: {$sum: "$count"}}}
+        ]);
+}
+
+/**
  * Create tweet controller
  * @param {Object} req - request object
  * @param {Object} req.body - request object body
@@ -90,10 +104,10 @@ function getTweets(req, res) {
                 .catch(() => {
                     reject();
                 });
-        } else{
+        } else {
             user && resolve({author: {$in: [user]}});
             tweet && resolve({parentTweet: tweet});
-            search && resolve({"text" : {$regex : ".*"+search+".*"}});
+            search && resolve({"text": {$regex: ".*" + search + ".*"}});
             resolve({});
         }
     })
@@ -102,15 +116,35 @@ function getTweets(req, res) {
                 skip: +offset,
                 limit: +count,
                 sort: {createdAt: 'desc'}
-            }).populate('author').exec()
+            }).populate('author').lean().exec()
                 .then(tweets => {
-                    res.send(tweets);
+                    const countTweets = tweets.length;
+                    let counter = 0;
+                    if(countTweets){
+                        tweets.forEach(tweet=> {
+                            countReplies(tweet._id).then(resp=> {
+                                if (resp.length) {
+                                    var foundIndex = tweets.findIndex(x => String(x._id) === String(resp[0]._id));
+                                    foundIndex >= 0 && (tweets[foundIndex].replies = resp[0].number);
+                                }
+
+                                if (++counter >= countTweets) {
+                                    res.send(tweets);
+                                }
+                            }).catch(err=> {
+                                console.log(err);
+                                res.send(tweets);
+                            })
+                        });
+                    }else{
+                        res.send(tweets);
+                    }
                 })
                 .catch(() => {
                     res.sendStatus(404);
                 });
         })
-        .catch(()=>{
+        .catch(()=> {
             res.sendStatus(404);
         });
 }

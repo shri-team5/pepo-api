@@ -43,7 +43,14 @@ describe('Tweets', function() {
     it('Get 200 from /tweets', function(done) {
         request(server)
             .get('/tweets')
-            .expect(200, done);
+            .end(function(err, res) {
+                if (err) {
+                    throw err;
+                }
+
+                chai.expect(res.body).to.have.length(0);
+                done();
+            });
     });
 
     it('Checks if author exists', function(done) {
