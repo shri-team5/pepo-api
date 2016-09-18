@@ -5,4 +5,7 @@ switch(process.env.NODE_ENV || 'development') {
     case 'production':
         module.exports = require('./environments/production.js');
         break;
+    case 'testing':
+        module.exports = require('./environments/testing.js');
+        break;
 }

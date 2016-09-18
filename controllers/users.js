@@ -124,7 +124,17 @@ function updateUser(req, res) {
         });
 
 }
-
+/**
+ * Create user controller
+ * @param {Object} req - request object
+ * @param {Object} req.body - request body
+ * @param {String} req.body.username - Username
+ * @param {String} req.body.fullName - Full Name
+ * @param {String} req.body.description - User description field
+ * @param {String} req.body.avatarPath - avatar link
+ * @param res
+ * @returns {Promise.<TResult>|Promise}
+ */
 function createUser(req, res) {
     const {
             username,
