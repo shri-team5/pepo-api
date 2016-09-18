@@ -33,7 +33,6 @@ function createTweet(req, res) {
                     cloudinary.uploader.upload(
                         req.file.path,
                         function (result) {
-                            console.log(result);
                             tweet.image = result.secure_url;
                             fulfill(tweet);
                         },

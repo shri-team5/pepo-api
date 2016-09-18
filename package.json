@@ -39,6 +39,7 @@
     "forever": "^0.15.2",
     "migrate-mongoose": "^2.0.2",
     "mocha": "^3.0.2",
+    "mocha-mongoose": "^1.2.0",
     "nodemon": "^1.10.2",
     "shipit-cli": "^1.4.1",
     "shipit-deploy": "^2.2.0",
