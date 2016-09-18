@@ -92,7 +92,7 @@ function createTweet(req, res) {
  * @param res
  */
 function getTweets(req, res) {
-    const {user, feed, tweet, search, offset, count,} = req.query;
+    const {user, username, feed, tweet, search, offset, count,} = req.query;
 
     new Promise((resolve, reject)=> {
 
@@ -105,10 +105,18 @@ function getTweets(req, res) {
                     reject();
                 });
         } else {
-            user && resolve({author: {$in: [user]}});
             tweet && resolve({parentTweet: tweet});
             search && resolve({"text": {$regex: ".*" + search + ".*"}});
-            resolve({});
+            user && resolve({author: {$in: [user]}});
+            if(username){
+                User.findOne({username: username})
+                    .then(userObj => {
+                        resolve({author: {$in: [userObj._id]}})
+                    })
+                    .catch((err) => res.sendStatus(404));
+            }else{
+                resolve({});
+            }
         }
     })
         .then(query => {
