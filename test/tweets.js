@@ -7,6 +7,9 @@ var clearDB  = require('mocha-mongoose')(config.mongodb.uri, {noClear: true});
 describe('Tweets', function() {
     var server;
     var userObject;
+    var tweetObject;
+    var tweetReplyObject;
+
     before(function(done) {
         clearDB(done);
     });
@@ -28,10 +31,7 @@ describe('Tweets', function() {
                 if (err) {
                     throw err;
                 }
-
                 userObject = res.body;
-
-
                 done();
             });
     });
@@ -46,23 +46,95 @@ describe('Tweets', function() {
             .expect(200, done);
     });
 
-
-
     it('Checks if author exists', function(done) {
         request(server)
             .get('/users/'+userObject._id)
             .expect(200, done)
     });
     
-    it('It should create tweet', function(done) {
+    it('Should create tweet', function(done) {
         var tweet = {
             userId: userObject._id,
-            text: 'test',
-            type: 'text'
+            text: 'test'
         };
         request(server)
             .post('/tweets')
             .send(tweet)
-            .expect(200, done);
+            .expect(200)
+            .end(function(err, res) {
+                if (err) {
+                    throw err;
+                }
+                tweetObject = res.body;
+                done();
+            });
+    });
+
+    it('Should get created tweet', function(done) {
+        request(server)
+            .get('/tweets/'+tweetObject._id)
+            .expect(200, done)
+    });
+
+    it('Should create reply tweet', function(done) {
+        var tweet = {
+            userId: userObject._id,
+            text: 'test reply',
+            parentTweet: tweetObject._id
+        };
+        request(server)
+            .post('/tweets')
+            .send(tweet)
+            .expect(200)
+            .end(function(err, res) {
+                if (err) {
+                    throw err;
+                }
+                tweetReplyObject = res.body;
+                done();
+            });
+    });
+
+    it('Should get tweet replies', function(done) {
+        request(server)
+            .get('/tweets/')
+            .query({tweet:tweetObject._id})
+            .expect(200)
+            .end(function(err, res) {
+                if (err) {
+                    throw err;
+                }
+                chai.expect(res.body).to.have.length(1);
+
+                done();
+            });
+    });
+
+    it('Should return 2 tweets (all)', function(done) {
+        request(server)
+            .get('/tweets')
+            .end(function(err, res) {
+                if (err) {
+                    throw err;
+                }
+
+                chai.expect(res.body).to.have.length(2);
+                done();
+            });
+    });
+
+    it('Should return 1 tweet with text reply', function(done) {
+        request(server)
+            .get('/tweets')
+            .query({search:'reply'})
+            .end(function(err, res) {
+                if (err) {
+                    throw err;
+                }
+
+                chai.expect(res.body).to.have.length(1);
+                chai.expect(res.body[0].text).to.contain('reply');
+                done();
+            });
     });
 });

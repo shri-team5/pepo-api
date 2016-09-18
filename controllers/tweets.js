@@ -11,8 +11,19 @@ cloudinary.config({
     api_secret: config.cloudinary.secret_access_key
 });
 
+/**
+ * Create tweet controller
+ * @param {Object} req - request object
+ * @param {Object} req.body - request object body
+ * @param {Object} [req.file] - request object file
+ * @param {String} req.body.text - tweet text
+ * @param {String} req.body.userId - userId
+ * @param {String} [req.body.parentTweet] - parent tweet id (fore reply)
+ * @param {String} [req.body.location] - coordinates
+ * @param res
+ */
 function createTweet(req, res) {
-    const {userId, text, type, parentTweet, location, address} = req.body;
+    const {userId, text, parentTweet, location} = req.body;
 
     if (!userId) {
         return res.sendStatus(400);
@@ -22,12 +33,9 @@ function createTweet(req, res) {
         .then(user => {
             const tweet = new Tweet();
             tweet.text = xss(text);
-            tweet.type = type;
             tweet.author = user;
             (parentTweet) && (tweet.parentTweet = parentTweet);
             (location) && (tweet.location = location);
-            (address) && (tweet.parentTweet = address);
-
             return new Promise(function (fulfill, reject) {
                 if (req.file) {
                     cloudinary.uploader.upload(
@@ -57,6 +65,18 @@ function createTweet(req, res) {
         });
 }
 
+/**
+ * Return filtered tweets
+ * @param {Object} req - request object
+ * @param {Object} req.body - request object body
+ * @param {String} [req.body.user] - userId (get users tweets)
+ * @param {String} [req.body.feed] - userId (get feed for user)
+ * @param {String} [req.body.tweet] - tweetId (get feed for user)
+ * @param {String} [req.body.search] - text (global search)
+ * @param {Number} [req.body.offset] - offset filter
+ * @param {Number} [req.body.count] - limit filter
+ * @param res
+ */
 function getTweets(req, res) {
     const {user, feed, tweet, search, offset, count,} = req.query;
 
@@ -95,6 +115,13 @@ function getTweets(req, res) {
         });
 }
 
+/**
+ * Get tweet info
+ * @param {Object} req - request object
+ * @param {Object} req.body - request object body
+ * @param {String} req.body.tweetId - tweetId
+ * @param res
+ */
 function getTweet(req, res) {
 
     const {tweetId} = req.params;
