@@ -37,7 +37,7 @@ function countReplies(tweet_id) {
  * @param res
  */
 function createTweet(req, res) {
-    const {userId, text, parentTweet, location} = req.body;
+    const {userId, text, parentTweet, location, linkimage, linktitle, linkdesc} = req.body;
 
     if (!userId) {
         return res.sendStatus(400);
@@ -50,6 +50,13 @@ function createTweet(req, res) {
             tweet.author = user;
             (parentTweet) && (tweet.parentTweet = parentTweet);
             (location) && (tweet.location = location);
+
+            (linkimage || linktitle || linkdesc) && (tweet.link = {
+                image: linkimage,
+                title: linktitle,
+                description: linkdesc
+            });
+
             return new Promise(function (fulfill, reject) {
                 if (req.file) {
                     cloudinary.uploader.upload(

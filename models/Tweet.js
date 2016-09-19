@@ -7,7 +7,13 @@ const TweetSchema = new Schema({
     author: { type: ObjectId, ref: 'User', required: true },
     image: { type: String },
     parentTweet: { type: ObjectId, ref: 'Tweet' },
-    location: { type: String, maxlength: 140}
+    location: { type: String, maxlength: 140},
+    link: {
+        image: String,
+        title: String,
+        description: String,
+        url: String
+    }
 }, {
     timestamps: true
 });
