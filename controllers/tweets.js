@@ -37,7 +37,7 @@ function countReplies(tweet_id) {
  * @param res
  */
 function createTweet(req, res) {
-    const {userId, text, parentTweet, location, linkimage, linktitle, linkdesc} = req.body;
+    const {userId, text, parentTweet, location, linkimage, linktitle, linkdesc, linkurl} = req.body;
 
     if (!userId) {
         return res.sendStatus(400);
@@ -54,7 +54,8 @@ function createTweet(req, res) {
             (linkimage || linktitle || linkdesc) && (tweet.link = {
                 image: linkimage,
                 title: linktitle,
-                description: linkdesc
+                description: linkdesc,
+                url: linkurl
             });
 
             return new Promise(function (fulfill, reject) {
