@@ -48,13 +48,20 @@ function getUser(req, res) {
 
     const user = User.findById(id);
     const userTweetsNumber = Tweet.count({"author": id});
-    const userSubscribersNumber = User.count({subscriptions: {$in: [id]}});
+    const userSubscribers = User.find({subscriptions: {$in: [id]}});
 
-    Promise.all([user, userTweetsNumber, userSubscribersNumber])
+    Promise.all([user, userTweetsNumber, userSubscribers])
         .then(responses => {
+
+            let subscribers = [];
+
+            if(responses[2].length){
+                subscribers = responses[2].map(item=>item._id)
+            }
+            
             res.send(Object.assign({},
                 {tweetsNumber: responses[1]},
-                {subscribersNumber: responses[2]},
+                {subscribers: subscribers},
                 responses[0]._doc));
         })
         .catch(() => res.sendStatus(404))

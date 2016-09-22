@@ -77,9 +77,11 @@ function createTweet(req, res) {
             });
         })
         .then((tweet) => {
+
             return tweet.save();
         })
         .then((data) => {
+            req.io.sockets.json.send({'event': 'new-tweet', 'data': data}); 
             return res.send(data);
         })
         .catch(() => {
