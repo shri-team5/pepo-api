@@ -9,6 +9,18 @@ const usersRouter = require('./routers/users');
 
 const app = express();
 
+const io = require('socket.io').listen(8086);
+io.sockets.on('connection', function (socket) {
+    var time = (new Date).toLocaleTimeString();
+    socket.json.send({'event': 'connected', 'time': time}); 
+});
+
+
+app.use(function(req, res, next) {
+    req.io = io;
+    next();
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
