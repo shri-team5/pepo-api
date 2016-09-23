@@ -7,7 +7,7 @@ const vkontakteIdPath = path(['vkontakte', 'id']);
 const facebookIdPath = path(['facebook', 'id']);
 
 var cloudinary = require('cloudinary');
-var xss = require('xss');
+const xss = require('xss');
 
 const config = require('../config');
 cloudinary.config({
@@ -102,9 +102,9 @@ function updateUser(req, res) {
         return Promise.resolve(res.sendStatus(400));
     }
 
-    username && (update.username = username);
-    fullName && (update.fullName = fullName);
-    description && (update.description = description);
+    username && (update.username = xss(username));
+    fullName && (update.fullName = xss(fullName));
+    description && (update.description = xss(description));
 
     new Promise((resolve, reject)=> {
         if (req.file) {

@@ -3,7 +3,7 @@ const Tweet = require('../models/Tweet');
 
 const config = require('../config');
 var cloudinary = require('cloudinary');
-var xss = require('xss');
+const xss = require('xss');
 
 cloudinary.config({
     cloud_name: config.cloudinary.cloud_name,
