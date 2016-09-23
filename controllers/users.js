@@ -2,6 +2,7 @@ const {path} = require('ramda');
 
 const User = require('../models/User');
 const Tweet = require('../models/Tweet');
+var xss = require('xss');
 
 const vkontakteIdPath = path(['vkontakte', 'id']);
 const facebookIdPath = path(['facebook', 'id']);
@@ -102,9 +103,9 @@ function updateUser(req, res) {
         return Promise.resolve(res.sendStatus(400));
     }
 
-    username && (update.username = username);
-    fullName && (update.fullName = fullName);
-    description && (update.description = description);
+    username && (update.username = xss(username));
+    fullName && (update.fullName = xss(fullName));
+    description && (update.description = xss(description));
 
     new Promise((resolve, reject)=> {
         if (req.file) {
