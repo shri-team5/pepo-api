@@ -13,8 +13,9 @@ describe('Tweets', function() {
     before(function(done) {
         clearDB(done);
     });
-    before(function() {
+    before(function(done) {
         server = require('../index');
+        setTimeout(done, 1000)
     });
     before(function(done) {
         var user = {
@@ -23,12 +24,15 @@ describe('Tweets', function() {
             description: 'Test description',
             avatarPath: 'Avatar path'
         };
+
+        console.log('Create user test');
         request(server)
             .post('/users')
             .send(user)
             .expect(200)
             .end(function(err, res) {
                 if (err) {
+                    console.log(err);
                     throw err;
                 }
                 userObject = res.body;

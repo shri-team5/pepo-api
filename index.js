@@ -9,10 +9,12 @@ const usersRouter = require('./routers/users');
 
 const app = express();
 
-const io = require('socket.io').listen(8086);
+const server = require('http').createServer(app);
+
+const io = require('socket.io').listen(server);
 io.sockets.on('connection', function (socket) {
     var time = (new Date).toLocaleTimeString();
-    socket.json.send({'event': 'connected', 'time': time}); 
+    socket.json.send({'event': 'connected', 'time': time});
 });
 
 
@@ -34,12 +36,13 @@ function connect() {
 function listen() {
     const port = process.env.PORT || config.defaultPort;
 
-    return app.listen(port, () => {
+    return server.listen(port, () => {
         console.log(`Server started at port: ${port}`);
     });
 }
 
-const server = listen();
+const serverStart = listen();
+
 
 connect()
     .on('error', console.error)
@@ -49,4 +52,4 @@ connect()
     });
 
 
-module.exports = server;
+module.exports = serverStart;
