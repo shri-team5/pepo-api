@@ -2,13 +2,12 @@ const {path} = require('ramda');
 
 const User = require('../models/User');
 const Tweet = require('../models/Tweet');
-var xss = require('xss');
 
 const vkontakteIdPath = path(['vkontakte', 'id']);
 const facebookIdPath = path(['facebook', 'id']);
 
 var cloudinary = require('cloudinary');
-var xss = require('xss');
+const xss = require('xss');
 
 const config = require('../config');
 cloudinary.config({
