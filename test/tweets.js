@@ -13,8 +13,9 @@ describe('Tweets', function() {
     before(function(done) {
         clearDB(done);
     });
-    before(function() {
+    before(function(done) {
         server = require('../index');
+        setTimeout(done, 1000)
     });
     before(function(done) {
         var user = {
