@@ -23,12 +23,15 @@ describe('Tweets', function() {
             description: 'Test description',
             avatarPath: 'Avatar path'
         };
+
+        console.log('Create user test');
         request(server)
             .post('/users')
             .send(user)
             .expect(200)
             .end(function(err, res) {
                 if (err) {
+                    console.log(err);
                     throw err;
                 }
                 userObject = res.body;
